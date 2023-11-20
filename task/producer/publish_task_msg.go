@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-redis/redis"
 	"redis-quickstart/model"
+	"strconv"
 )
 
 func main() {
@@ -77,8 +78,31 @@ func main() {
 		fmt.Println("Failed to store task in Redis hash:", err)
 		return
 	}
-
 	fmt.Println("Task stored in Redis hash: global_tasks")
+
+	// 下发用户优先级队
+	//err = client.ZAdd("user_priority", float64(1), float64(task.UserID).Err()
+	z := redis.Z{Score: 0.5, Member: task.UserID}
+	result := client.ZAdd("user_priority", z)
+	if result.Err() != nil {
+		// Handle the error
+		fmt.Println("Error:", result.Err())
+	} else {
+		// No error, ZAdd operation was successful
+		fmt.Println("ZAdd operation successful")
+	}
+
+	//下发任务队列
+	t := redis.Z{Score: 0.5, Member: task.TaskID}
+	user_task := "user_tasks_" + strconv.Itoa(task.UserID)
+	result = client.ZAdd(user_task, t)
+	if result.Err() != nil {
+		// Handle the error
+		fmt.Println("Error:", result.Err())
+	} else {
+		// No error, ZAdd operation was successful
+		fmt.Println("ZAdd user_task successful")
+	}
 
 	// Close the Redis client connection
 	err = client.Close()
