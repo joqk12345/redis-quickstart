@@ -3,11 +3,30 @@
   - [x] 保证按照任务的优先级调度
   - [ ] lru调度
 2. 任务下发使用golang实现
+   - [ ] 下发任务
 3. 任务消费使用Python实现
+   - [ ] 消费任务
 
 ## 设计原理
 ### 通信原理
 ## 消息设计
+
+1. global_tasks:
+   1. type:(hashmap) 
+   2. key：task_id 
+   3. value：task_info
+2. user_priority:
+   1. type:(zset)
+   2. key：user_id
+   3. value: score
+   4. 备注： 用户的优先级可以不同
+3. user_tasks
+   1. type:(zset)
+   2. task_{user_id}
+   3. key：task_id
+   4. value: score
+   5. 备注： 一个用户一个zset 存储改用户任务优先级
+
 ## 任务下发
 ## 任务消费
 
