@@ -1,4 +1,11 @@
-1.  hash
+## ops
+1. connection
+```shell
+redis-cli
+```
+
+## mutiply 
+3. hash
 
 ```sh
 hkeys global_tasks
@@ -20,4 +27,15 @@ keys user_tasks*
 
 zrange user_tasks_1 0 5 withscores
 
+```
+
+4. task_result_list
+
+* 查看指定范围的内容
+```shell
+LRANGE task_result_list 0 10
+```
+* 查看队列长度
+```shell
+LLEN task_result_list
 ```
