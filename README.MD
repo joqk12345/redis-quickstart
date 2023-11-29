@@ -54,3 +54,17 @@
   6. **分布式锁**：通过Redis实现分布式锁，保证多个进程或服务的同步性。
 
 Redis是一个功能强大、灵活多样的存储系统，由于其高性能和多种数据结构的支持，在许多应用程序中被广泛使用。
+
+## 任务结果字段
+
+```json
+{
+  "task_id": "test123",
+  "error_code": 0,
+  "err_msg": "",
+  "data": {
+    "link": "s3://test/123/asdfasd/asdfasdf",
+    "osspath": "s3://test/123.mp3"
+  }
+}
+```
