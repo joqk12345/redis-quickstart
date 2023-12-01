@@ -1,9 +1,10 @@
 package rdb
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 	"redis-quickstart/task/model"
 	"strconv"
 	"time"
@@ -47,23 +48,25 @@ func (rc *RedisClient) PutTaskRecord(record model.TaskRecord) error {
 		fmt.Println("Failed to marshal task to JSON:", err)
 		return nil
 	}
-	err = rc.client.HSet(global_tasks, record.TaskID, taskJSON).Err()
+	err = rc.client.HSet(context.Background(), global_tasks, record.TaskID, taskJSON).Err()
 	if err != nil {
 		fmt.Println("Failed to store task in Redis hash:", err)
 		return err
 	}
 	// 下发用户优先级队
-	z := redis.Z{Score: 0.5, Member: record.UserId}
-	result := rc.client.ZAdd(user_priority, z)
+	//z := redis.Z{Score: 0.5, Member: record.UserId}
+	z := &redis.Z{Score: 0.5, Member: strconv.Itoa(int(record.UserId))}
+	result := rc.client.ZAdd(context.Background(), user_priority, z)
 	if result.Err() != nil {
 		fmt.Println("Error:", result.Err())
 	} else {
 		fmt.Println("ZAdd operation successful")
 	}
 	//下发任务队列
-	t := redis.Z{Score: 0.5, Member: record.TaskID}
+	//t := redis.Z{Score: 0.5, Member: record.TaskID}
+	t := &redis.Z{Score: 0.5, Member: record.TaskID}
 	user_task := user_task_prefix + strconv.Itoa(int(record.UserId))
-	result = rc.client.ZAdd(user_task, t)
+	result = rc.client.ZAdd(context.Background(), user_task, t)
 	if result.Err() != nil {
 		fmt.Println("Error:", result.Err())
 	} else {
@@ -73,7 +76,7 @@ func (rc *RedisClient) PutTaskRecord(record model.TaskRecord) error {
 }
 
 func (rc *RedisClient) PullTaskResult() (string, error) {
-	result, err := rc.client.RPop(task_result_list).Result()
+	result, err := rc.client.RPop(context.Background(), task_result_list).Result()
 	if err == redis.Nil {
 		time.Sleep(5 * time.Second)
 	} else if err != nil {
@@ -83,7 +86,7 @@ func (rc *RedisClient) PullTaskResult() (string, error) {
 }
 
 func (rc *RedisClient) GetTaskResultLen() (int64, error) {
-	result_len, err := rc.client.LLen(task_result_list).Result()
+	result_len, err := rc.client.LLen(context.Background(), task_result_list).Result()
 	if err == redis.Nil {
 		time.Sleep(5 * time.Second)
 	} else if err != nil {
@@ -95,7 +98,7 @@ func (rc *RedisClient) GetTaskResultLen() (int64, error) {
 func (rc *RedisClient) PutTaskResult(result model.TaskResult) (int64, error) {
 
 	taskResultJSON, err := json.Marshal(result)
-	result_len, err := rc.client.LPush(task_result_list, taskResultJSON).Result()
+	result_len, err := rc.client.LPush(context.Background(), task_result_list, taskResultJSON).Result()
 	if err != nil {
 		fmt.Println("put task Result  error:", err)
 	}

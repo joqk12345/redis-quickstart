@@ -11,7 +11,7 @@ func put_task() {
 	rc := rdb.NewRedisClient()
 	defer rc.Close()
 	var record model.TaskRecord
-	record.TaskID = "test2"
+	record.TaskID = "727122b732494578bcf140cee2eeba15"
 	record.Name = "content2text"
 	record.Type = "http"
 
@@ -31,7 +31,8 @@ func put_task() {
 		CharacterLength int     `json:"character_len"`
 		TTSConf         TTSConf `json:"tts_conf"`
 	}{
-		URL:             "https://www.wsj.com/tech/ai/openai-leadership-hangs-in-balance-as-sam-altmans-counte-rebellion-gains-steam-47276fa8?mod=hp_lead_pos1",
+		//URL:             "https://www.wsj.com/tech/ai/openai-leadership-hangs-in-balance-as-sam-altmans-counte-rebellion-gains-steam-47276fa8?mod=hp_lead_pos1",
+		URL:             "https://twitter.com/TheInvestorLEI/status/1729932043038134600",
 		Title:           "Sam Altman to Join Microsoft Following OpenAI Ouster",
 		CharacterLength: 190,
 		TTSConf: TTSConf{
@@ -74,7 +75,7 @@ func put_task_result() {
 	data["link"] = "s3://test/123/asdfasd/asdfasdf"
 
 	taskResult := model.TaskResult{
-		TaskID:    "test123",
+		TaskID:    "727122b732494578bcf140cee2eeba15",
 		ErrMsg:    "",
 		ErrorCode: 0,
 		Data:      data,
@@ -85,5 +86,6 @@ func put_task_result() {
 }
 
 func main() {
-	put_task_result()
+	put_task()
+	//put_task_result()
 }
