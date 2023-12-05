@@ -2,7 +2,9 @@ package rdb
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
+
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"redis-quickstart/task/model"
@@ -20,14 +22,30 @@ type RedisClient struct {
 }
 
 func NewRedisClient() *RedisClient {
-	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379", // Redis server address
-		Password: "",               // Redis password (if any)
-		DB:       0,                // Redis database number
-	})
-	return &RedisClient{
-		client: client,
+	enable_tls := true
+	if enable_tls == true {
+		client := redis.NewClient(&redis.Options{
+			Addr:     "x", // 替换为您的 Amazon MemoryDB 终端节点和端口
+			Password: "",  // 如果有密码，请提供密码
+			DB:       0,
+			TLSConfig: &tls.Config{
+				InsecureSkipVerify: false, // 如果您有证书，请设置为 false，并提供证书验证
+			},
+		})
+		return &RedisClient{
+			client: client,
+		}
+	} else {
+		client := redis.NewClient(&redis.Options{
+			Addr:     "localhost:6379", // Redis server address
+			Password: "",               // Redis password (if any)
+			DB:       0,                // Redis database number
+		})
+		return &RedisClient{
+			client: client,
+		}
 	}
+
 }
 
 func (rc *RedisClient) PutTaskRecord(record model.TaskRecord) error {
